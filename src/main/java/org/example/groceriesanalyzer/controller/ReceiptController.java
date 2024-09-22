@@ -1,5 +1,6 @@
 package org.example.groceriesanalyzer.controller;
 
+import org.example.groceriesanalyzer.dto.ReceiptItemDTO;
 import org.example.groceriesanalyzer.service.AiService;
 import org.example.groceriesanalyzer.service.OcrService;
 import org.slf4j.Logger;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/receipt")
@@ -28,10 +31,10 @@ public class ReceiptController {
     }
 
     @PostMapping("/process")
-    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<List<ReceiptItemDTO>> uploadImage(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             logger.warn("file was empty");
-            return ResponseEntity.badRequest().body("File is empty");
+            return ResponseEntity.badRequest().body(null);
         }
 
         try {
@@ -40,13 +43,13 @@ public class ReceiptController {
             logger.info(ocrResult);
 
             // Process the text with AI
-            String aiResult = aiService.analyzeReceiptContent(ocrResult);
-            logger.info(aiResult);
+            List<ReceiptItemDTO> aiResult = aiService.analyzeReceiptContent(ocrResult);
 
             // Optionally, process the result as needed
-            return ResponseEntity.ok("OCR result processed successfully");
+            return ResponseEntity.ok(aiResult);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing the image");
+            logger.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
