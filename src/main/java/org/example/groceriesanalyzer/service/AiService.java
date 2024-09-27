@@ -6,7 +6,7 @@ import com.azure.ai.openai.models.*;
 import com.azure.core.credential.AzureKeyCredential;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.groceriesanalyzer.dto.ReceiptItemDTO;
+import org.example.groceriesanalyzer.dto.PurchaseItemDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,16 +35,22 @@ public class AiService {
                 .buildClient();
     }
 
-    public List<ReceiptItemDTO> analyzeReceiptContent(String receiptContent) throws JsonProcessingException {
+    public List<PurchaseItemDTO> analyzeReceiptContent(String receiptContent) throws JsonProcessingException {
         List<ChatRequestMessage> chatMessages = new ArrayList<>();
         chatMessages.add(new ChatRequestSystemMessage(
                 "You will receive an OCR text from a grocery receipt in Brazilian Portuguese. It lists purchased " +
-                        "items with the fields: CODIGO (code), QTD or Quantidade (quantity), VL UNIT (price), and " +
-                        "DESCRICAO (description). Convert these items into a JSON array with {code, description, " +
-                        "unitValue, unitIdentifier, quantity}, and use the first letter for unitIdentifier, e.g., " +
-                        "UNID becomes 'U', KG becomes 'K'. Do not include anything else in the response, only the " +
-                        "JSON array, please dont add formating character for markdown like '```json' for example just" +
-                        " the text"));
+                        "items with the following fields: CODIGO (code), QTD or Quantidade (quantity), VL UNIT (unit " +
+                        "price), DESCRICAO (description), and VL ITEM or TOTAL (total value). Convert these items " +
+                        "into a JSON array with the structure:" +
+                        "{ code, description, unitValue, unitIdentifier, quantity, totalValue, categories }" +
+                        "unitIdentifier: Use the first letter of the unit, e.g., 'UNID' becomes 'U', 'KG' becomes 'K'" +
+                        ". For any other unit, default to 'U'." +
+                        "categories: Generate an array of up to two possible categories, in brazilian portuguese, " +
+                        "inferred from the descricao " +
+                        "text. These should represent relevant categories for the item based on its description (e.g" +
+                        "., \"fruits\", \"beverages\", \"snacks\")." +
+                        "Only return the JSON array in the response. No additional formatting or explanations (e.g., " +
+                        "no '```json' or markdown syntax)."));
         chatMessages.add(new ChatRequestUserMessage(receiptContent));
 
         ChatCompletions chatCompletions = this.openAIClient.getChatCompletions(deploymentAi,
@@ -60,10 +66,10 @@ public class AiService {
         return convertReceiptItems(chatCompletions.getChoices().getFirst().getMessage().getContent());
     }
 
-    private List<ReceiptItemDTO> convertReceiptItems(String receiptContent) throws JsonProcessingException {
+    private List<PurchaseItemDTO> convertReceiptItems(String receiptContent) throws JsonProcessingException {
         logger.info(receiptContent);
         return objectMapper.readValue(receiptContent,
-                objectMapper.getTypeFactory().constructCollectionType(List.class, ReceiptItemDTO.class));
+                objectMapper.getTypeFactory().constructCollectionType(List.class, PurchaseItemDTO.class));
     }
 
 }
