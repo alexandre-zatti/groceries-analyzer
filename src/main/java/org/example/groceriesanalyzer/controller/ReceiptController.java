@@ -1,6 +1,6 @@
 package org.example.groceriesanalyzer.controller;
 
-import org.example.groceriesanalyzer.dto.ReceiptItemDTO;
+import org.example.groceriesanalyzer.dto.PurchaseItemDTO;
 import org.example.groceriesanalyzer.service.AiService;
 import org.example.groceriesanalyzer.service.OcrService;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ public class ReceiptController {
     }
 
     @PostMapping("/process")
-    public ResponseEntity<List<ReceiptItemDTO>> uploadImage(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<List<PurchaseItemDTO>> processReceipt(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             logger.warn("file was empty");
             return ResponseEntity.badRequest().body(null);
@@ -43,7 +43,7 @@ public class ReceiptController {
             logger.info(ocrResult);
 
             // Process the text with AI
-            List<ReceiptItemDTO> aiResult = aiService.analyzeReceiptContent(ocrResult);
+            List<PurchaseItemDTO> aiResult = aiService.analyzeReceiptContent(ocrResult);
 
             // Optionally, process the result as needed
             return ResponseEntity.ok(aiResult);
