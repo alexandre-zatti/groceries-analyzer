@@ -1,17 +1,27 @@
 package org.example.groceriesanalyzer.service;
 
-import org.example.groceriesanalyzer.dto.PurchaseItemDTO;
-import org.example.groceriesanalyzer.dto.PurchaseResponseDTO;
+import org.example.groceriesanalyzer.dto.PurchaseRequestDTO;
+import org.example.groceriesanalyzer.entity.Purchase;
+import org.example.groceriesanalyzer.mapper.PurchaseMapper;
+import org.example.groceriesanalyzer.repository.PurchaseRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class PurchaseService {
 
-    public PurchaseResponseDTO processPurchase(LocalDate purchaseDate, List<PurchaseItemDTO> purchaseItems) {
-        Double totalPurchasePrice = purchaseItems.stream().mapToDouble(PurchaseItemDTO::totalValue).sum();
-        return new PurchaseResponseDTO(purchaseDate, totalPurchasePrice, purchaseItems);
+    private final PurchaseRepository purchaseRepository;
+
+    @Autowired
+    public PurchaseService(PurchaseRepository purchaseRepository) {
+        this.purchaseRepository = purchaseRepository;
     }
+
+    public void savePurchase(PurchaseRequestDTO purchase) {
+        List<Purchase> flatPurchase = PurchaseMapper.toFlatPurchases(purchase);
+        purchaseRepository.saveAll(flatPurchase);
+    }
+
 }

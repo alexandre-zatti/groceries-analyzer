@@ -35,7 +35,7 @@ public class AiService {
                 .buildClient();
     }
 
-    public List<PurchaseItemDTO> analyzeReceiptContent(String receiptContent) throws JsonProcessingException {
+    public List<PurchaseItemDTO> extractReceiptItems(String receiptContent) throws JsonProcessingException {
         List<ChatRequestMessage> chatMessages = new ArrayList<>();
         chatMessages.add(new ChatRequestSystemMessage(
                 "You will receive an OCR text from a grocery receipt in Brazilian Portuguese. It lists purchased " +
