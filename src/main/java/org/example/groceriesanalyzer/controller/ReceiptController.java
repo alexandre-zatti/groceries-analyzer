@@ -8,7 +8,6 @@ import org.example.groceriesanalyzer.service.ReceiptService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,20 +40,14 @@ public class ReceiptController {
             return ResponseEntity.badRequest().body(null);
         }
 
-        try {
-            // Analyze the image with OCR
-            String ocrResult = ocrService.analyzeImage(file);
-            logger.info(ocrResult);
+        String ocrResult = ocrService.analyzeImage(file);
+        logger.info(ocrResult);
 
-            // Extract items with AI
-            List<PurchaseItemDTO> aiResult = aiService.extractReceiptItems(ocrResult);
+        // Extract items with AI
+        List<PurchaseItemDTO> aiResult = aiService.extractReceiptItems(ocrResult);
 
-            // Optionally, process the result as needed
-            return ResponseEntity.ok(receiptService.processReceipt(aiResult));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+        // Optionally, process the result as needed
+        return ResponseEntity.ok(receiptService.processReceipt(aiResult));
     }
 
 }

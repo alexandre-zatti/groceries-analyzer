@@ -1,5 +1,7 @@
 package org.example.groceriesanalyzer.controller;
 
+
+import jakarta.validation.Valid;
 import org.example.groceriesanalyzer.dto.PurchaseRequestDTO;
 import org.example.groceriesanalyzer.service.PurchaseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/purchase")
 public class PurchaseController {
 
-    //    private static final Logger logger = LoggerFactory.getLogger(PurchaseController.class);
     private final PurchaseService purchaseService;
 
     @Autowired
@@ -22,9 +23,8 @@ public class PurchaseController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity save(@RequestBody PurchaseRequestDTO purchase) {
+    public ResponseEntity save(@Valid @RequestBody PurchaseRequestDTO purchase) {
         purchaseService.savePurchase(purchase);
         return ResponseEntity.ok().build();
     }
-
 }
