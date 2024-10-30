@@ -22,7 +22,7 @@ public record PurchaseItemDTO(
         String unitIdentifier,
 
         @NotNull(message = "Quantity is required")
-        @Min(value = 1, message = "Quantity must be at least 1")
+        @Min(value = 0, message = "Quantity must be bigger than 0")
         Double quantity,
 
         @NotNull(message = "Total value is required")

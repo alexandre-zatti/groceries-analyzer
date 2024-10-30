@@ -1,6 +1,8 @@
 services:
   app:
-    image: 'zatti/groceries-analyzer:latest'
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: groceries-analyzer
     environment:
       - OCR_ENDPOINT=${OCR_ENDPOINT}
@@ -10,9 +12,6 @@ services:
       - AI_DEPLOYMENT=${AI_DEPLOYMENT}
       - API_KEY=${API_KEY}
       - ELASTICSEARCH_ENDPOINT=${ELASTICSEARCH_ENDPOINT}
-    build:
-      context: .
-      dockerfile: Dockerfile
     ports:
       - '8080:8080'
     networks:
