@@ -35,7 +35,7 @@ public class AiService {
                 .buildClient();
     }
 
-    public List<PurchaseItemDTO> extractReceiptItems(String receiptContent) throws JsonProcessingException {
+    public List<PurchaseItemDTO> extractReceiptItems(String receiptContent) {
         List<ChatRequestMessage> chatMessages = new ArrayList<>();
         chatMessages.add(new ChatRequestSystemMessage(
                 "You will receive an OCR text from a grocery receipt in Brazilian Portuguese. It lists purchased " +
@@ -63,7 +63,15 @@ public class AiService {
                         "tokens is {}.",
                 usage.getPromptTokens(), usage.getCompletionTokens(), usage.getTotalTokens());
 
-        return convertReceiptItems(chatCompletions.getChoices().getFirst().getMessage().getContent());
+        List<PurchaseItemDTO> convertedItems = new ArrayList<>();
+
+        try {
+            convertedItems = convertReceiptItems(chatCompletions.getChoices().getFirst().getMessage().getContent());
+        } catch (JsonProcessingException jpe) {
+            throw new RuntimeException("Error converting receipt items to JSON", jpe);
+        }
+
+        return convertedItems;
     }
 
     private List<PurchaseItemDTO> convertReceiptItems(String receiptContent) throws JsonProcessingException {

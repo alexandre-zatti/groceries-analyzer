@@ -25,21 +25,23 @@ public class OcrService {
                 .buildClient();
     }
 
-    public String analyzeImage(MultipartFile imageFile) throws IOException {
-        // Convert the file to BinaryData and call the OCR service
-        BinaryData imageData = BinaryData.fromBytes(imageFile.getBytes());
-        ImageAnalysisResult result = client.analyze(
-                imageData,
-                Collections.singletonList(VisualFeatures.READ),
-                null
-        );
+    public String analyzeImage(MultipartFile imageFile) {
+        try {
+            BinaryData imageData = BinaryData.fromBytes(imageFile.getBytes());
+            ImageAnalysisResult result = client.analyze(
+                    imageData,
+                    Collections.singletonList(VisualFeatures.READ),
+                    null
+            );
 
-        String OcrResult = "";
+            String OcrResult = "";
+            for (DetectedTextLine line : result.getRead().getBlocks().getFirst().getLines()) {
+                OcrResult = OcrResult.concat(line.getText() + "\n");
+            }
 
-        for (DetectedTextLine line : result.getRead().getBlocks().getFirst().getLines()) {
-            OcrResult = OcrResult.concat(line.getText() + "\n");
+            return OcrResult;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to process image", e);
         }
-
-        return OcrResult;
     }
 }
