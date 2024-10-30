@@ -43,10 +43,8 @@ public class ReceiptController {
         String ocrResult = ocrService.analyzeImage(file);
         logger.info(ocrResult);
 
-        // Extract items with AI
         List<PurchaseItemDTO> aiResult = aiService.extractReceiptItems(ocrResult);
 
-        // Optionally, process the result as needed
         return ResponseEntity.ok(receiptService.processReceipt(aiResult));
     }
 
