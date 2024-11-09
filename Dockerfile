@@ -28,6 +28,9 @@ WORKDIR /home/spring
 # Copy the built application JAR from the builder stage
 COPY --from=builder /app/target/*.jar app.jar
 
+# Set Java memory limits
+ENV JAVA_OPTS="-Xms512m -Xmx512m"
+
 # Expose the default Spring Boot port
 EXPOSE 8089
 
