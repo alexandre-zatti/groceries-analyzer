@@ -19,7 +19,7 @@ RUN ./mvnw clean package -DskipTests
 FROM eclipse-temurin:21-jre-alpine
 
 # Add the wget for internal health checks
-RUN apk add --no-cache wget
+RUN apk add --no-cache wget curl
 
 # Set a non-root user for security
 RUN addgroup -S spring && adduser -S spring -G spring
