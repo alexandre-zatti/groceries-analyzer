@@ -55,7 +55,7 @@ public class SecurityConfig {
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Collections.singletonList("*")); // Allow all origins
+        configuration.setAllowedOriginPatterns(Collections.singletonList("*")); // Use patterns instead of origins
         configuration.setAllowedMethods(Collections.singletonList("*")); // Allow all HTTP methods
         configuration.setAllowedHeaders(Collections.singletonList("*")); // Allow all headers
         configuration.setAllowCredentials(true); // Optional: Allow credentials (e.g., cookies)
