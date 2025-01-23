@@ -4,6 +4,7 @@ import org.example.groceriesanalyzer.filter.ApiKeyAuthFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -36,7 +37,11 @@ public class SecurityConfig {
                             response.getWriter().write("{\"error\": \"Unauthorized: API key is missing or invalid\"}");
                         }))
                 .authorizeHttpRequests(auth -> auth
+                        // Permit preflight OPTIONS requests for CORS
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // All other requests require authentication
                         .anyRequest().authenticated())
+                // Add CORS filter before authentication filters
                 .addFilterBefore(new CorsFilter(corsConfigurationSource()),
                         AuthorizationFilter.class) // Add CORS filter
                 .addFilterBefore(new ApiKeyAuthFilter(apiKey), AuthorizationFilter.class)
